@@ -1,39 +1,91 @@
 # WinUI Developer Documentation
 
-Welcome! This directory contains documentation for those developers working in the WinUI repository.
+Welcome! This directory contains documentation for developers working *in* the WinUI repository.
 
-Note that developer usage documentation can be found separately on docs.microsoft.com.
+> Looking for how to **use** WinUI in your own app? That documentation lives on
+> [Microsoft Learn](https://learn.microsoft.com/windows/apps/winui/), not here.
 
-## Table of Contents
+## Getting started
 
-- [Getting Started](#getting-started)
-  - [Repo Layout](#repo-layout)
-  - [Developer Guide](#developer-guide)
-  - [WinUI Test System](#winui-test-system)
-  - [Build System How-To](#build-system-how-to)
-  - [Windows App SDK](#windows-app-sdk)
-- [Design docs](#design-docs)
+- [Getting Started (build from GitHub)](../GettingStarted.md) - the concise, supported path to build WinUI from source. **Start here.**
+- [Repo structure](repo-structure.md) - how the repository is laid out.
+- [Developer guide](building/developer-guide.md) - the build in more depth, plus day-to-day tasks and advanced setup.
+- [Contributing to WinUI](../CONTRIBUTING.md) - contribution process, PR requirements, and CLA.
 
-## Getting Started
+## Building
 
-### Repo Layout
-To get an understanding of how the repository is laid out, see the [repo structure](repo-structure.md) doc.
+- [Developer guide](building/developer-guide.md) - prerequisites, machine setup, and running a build.
+- [Build system how-to](building/build-system-howto.md) - accomplishing common tasks with the build system.
+- [Build system design](building/build-system-design.md) - how the build system is architected.
+- [Advanced build topics](building/building-advanced.md)
+- [Building sample apps](building/building-sample-apps.md)
+- [Building a new-repo app](building/building-new-repo-app.md)
+- [Controls developer guide](building/controls-developer-guide.md)
+- [Submodules](building/submodules.md)
+- [Common errors FAQ](common-errors-FAQ.md)
+- [Ad-hoc testing of a local build with a fast inner loop](ad-hoc-testing-of-local-build-with-fast-inner-loop.md)
 
-### Developer Guide
-The [developer guide](./building/developer-guide.md) contains information on how to do the day-to-day tasks in this repo, as well as the tools and setup required to get going.
+## Testing
 
-### WinUI Test System
-See [Testing In WinUI FAQ](./testing/testing-FAQ.md) and [WinUI CI Test System Overview](./testing/test-system-overview.md) for information on how to run our test automation.
+- [Testing in WinUI FAQ](testing/testing-FAQ.md)
+- [WinUI test system overview](testing/test-system-overview.md)
+- [Test code in WinUI](testing/test-code-in-WinUI.md)
+- [Testing baseline (image) files](testing/testing-baseline.md)
+- [Testing with a C++ sample app](testing/testing-with-cpp-sample-app.md)
+- [UAP tests](testing/uap-tests.md)
+- [How to repro a XAML test failure](how-to-repro-a-xaml-test-failure.md)
 
-### Build System How-To
-For more detailed information on how to accomplish common tasks with the build system, see the [build system how-to doc](./building/build-system-howto.md) to help you accomplish your tasks
+## Debugging
 
-### Windows App SDK
-See [Windows App SDK Overview](winappsdk-overview.md) for an overview of WinUI 3 integration into the Windows App SDK.
+- [Debugging](debugging/debugging.md)
+- [Debugging tips](debugging/debugging-tips.md)
 
-## Design docs
-* [Build system](./building/build-system-design.md)
+## Performance
 
->Problem?  Please file an issue for help.
+- [Performance how-to](performance/perf-how-to.md)
+- [ETW performance tracing](performance/perf-etw.md)
+- [Profile-guided optimization (PGO)](performance/perf-pgo.md)
+
+## Authoring & architecture
+
+- [How to author a XAML control](how-to-author-a-xaml-control.md)
+- [Design notes / code architecture](design-notes/readme.md) - high-level design docs and per-feature specs.
+- [Property system](property-system.md)
+- [Property path binding architecture](PropertyPathBindingArchitecture.md)
+- [Hit testing](hit-testing.md)
+- [Runtime-enabled features](runtime-enabled-features.md)
+- [Telemetry events](telemetry-events.md)
+
+## Publishing & release
+
+- [Windows App SDK overview](winappsdk-overview.md) - how WinUI 3 integrates into the Windows App SDK.
+- [Build pipelines](publishing/build-pipelines.md)
+- [Build versioning](publishing/build-versioning.md)
+- [Release channels](publishing/release-channels.md)
+- [WinUI 3 release process](publishing/winui3-release-process.md)
+
+## API specs & process
+
+- [Public API review process](api-specs/public-api-review-process.md)
+- [API review process](api-specs/api-review-process.md)
+- Individual API specs live in [api-specs/](api-specs/).
+
+## Contributing (external contributor docs)
+
+- [Contribution handling](external/contribution_handling.md)
+- [Contribution workflow](external/contribution_workflow.md)
+- [Feature proposal process](external/feature_proposal_process.md)
+- [Triage](external/triage.md)
+- [Debugging build failures](external/debugging_buildfailures.md)
+- [Debugging crashes](external/debugging_crashes.md)
+
+## Writing docs
+
+- [Documentation style guide](docs-style-guide.md)
+- [Localization process](localization-process.md)
+
+---
+
+> Problem? Please file an issue for help.
 >
->Found a bug?  Please file an issue at [our issue tracker](https://github.com/microsoft/microsoft-ui-xaml/issues) and we'll triage it.
+> Found a bug? Please file an issue at [our issue tracker](https://github.com/microsoft/microsoft-ui-xaml/issues) and we'll triage it.

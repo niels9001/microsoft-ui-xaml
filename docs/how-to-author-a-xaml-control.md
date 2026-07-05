@@ -95,8 +95,8 @@ these docs for more information:
 * [Custom dependency properties](https://learn.microsoft.com/windows/uwp/xaml-platform/custom-dependency-properties)
 
 Note: In the Microsoft.UI.Xaml.Controls project, we use some custom code generation to automatically generate the boiler-plate 
-code required for DependencyProperties. See [DependencyPropertyCodeGen.cs](controls\tools\CustomTasks\DependencyPropertyCodeGen.cs)
-for more information and see the files under [controls\dev\Generated](controls\dev\Generated) for example output. This 
+code required for DependencyProperties. See [DependencyPropertyCodeGen.cs](../controls/tools/CustomTasks/DependencyPropertyCodeGen.cs)
+for more information and see the files under [controls/dev/Generated](../controls/dev/Generated) for example output. This 
 only applies to control development in the Microsoft.UI.Xaml.Controls project in this repo. For authoring controls in other
 projects, this code will need to be hand-written.
 

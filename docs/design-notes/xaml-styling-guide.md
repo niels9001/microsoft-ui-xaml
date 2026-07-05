@@ -422,7 +422,7 @@ It is best practice to never modify a control's visual with codebehind.
 By using binding to the exposed values from TemplateSettings, we ensure that the control
 remains customizable and re-templatable. 
 
-An example from [Expander.xaml](..\..controls\dev\InfoBadge\InfoBadge_themeresources.xaml), 
+An example from [Expander_themeresources.xaml](../../controls/dev/Expander/Expander_themeresources.xaml), 
 where `ContentHeight` is the calculated value of ExpanderContent's height. 
 
 ```xml
@@ -678,8 +678,8 @@ To know what themeresource to use, refer to the [Token Mapper](https://www.figma
 
 WinUI controls live under the `controls` directory. These scripts help set-up scaffolding for a new blank 
 control in the repo:
-- [GenerateNewControlInProject.cmd](./controls/tools/GenerateNewControlInProject.cmd)
-- [GenerateNewControlProject.cmd](./controls/tools/GenerateNewControlProject.cmd)
+- [GenerateNewControlInProject.cmd](../../controls/tools/GenerateNewControlInProject.cmd)
+- [GenerateNewControlProject.cmd](../../controls/tools/GenerateNewControlProject.cmd)
 
 _Note: They are quite outdated, and as such a lot of set-up needs to be done manually after running these scripts._
 

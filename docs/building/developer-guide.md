@@ -1,5 +1,10 @@
 # Developer Guide
 
+> [!NOTE]
+> If you are an external contributor building WinUI from GitHub for the first time, start with
+> [GettingStarted.md](../../GettingStarted.md) at the repo root — it is the concise, supported onboarding path.
+> This developer guide covers the same build in more depth plus advanced/internal workflows.
+
 This guide provides instructions on how to build the repo. If you encouter any errors in building WinUI or the WinUI Gallery, refer to [common errors FAQ](../common-errors-FAQ.md)
 Documentation related to concepts and code architecture of the repo can be found here:
 [Code architecture](../design-notes/readme.md). It contains high level concepts, important design decisions and
@@ -150,18 +155,23 @@ Note that the terms `chk` and `fre` are  currently used throughout the build to 
 configurations, respectively.
 
 #### Configuring the .NET version
-`init.cmd` is also responsible for controlling what .NET version the build targets. By default, it is .NET 6.
-However, it can be controlled by passing in either `net6` or `net7` as an argument (e.g. `init.cmd net6` will
-initialize the build to target .NET 6, `init.cmd x86fre net7` will initialize the build for x86fre targeting
-.NET 7, etc.). In the pipeline, this behavior is controlled using the `dotNetFrameworkVersion` pipeline
-variable with the same argument (e.g. setting `dotNetFrameworkVersion` to `net6` will target .NET 6).
+`init.cmd` is also responsible for controlling what .NET version the build targets. By default, it targets
+`net8.0`. It can be controlled by passing `net6`, `net7`, or `net8` as an argument (e.g. `init.cmd net6` will
+initialize the build to target .NET 6, `init.cmd x86fre net8` will initialize the build for x86fre targeting
+.NET 8, etc.). In the pipeline, this behavior is controlled using the `dotNetFrameworkVersion` pipeline
+variable with the same argument (e.g. setting `dotNetFrameworkVersion` to `net8` will target .NET 8).
+
+Note that the .NET *SDK* used to build the repo is pinned separately in
+[`global.json`](../../global.json) (currently the .NET 9 SDK), which can produce output for any of the
+supported target monikers above.
 
 To control the .NET version being targeted, `init.cmd` calls the
-[SetupDotNetFiles.cmd](../../scripts/init/SetupDotNetFiles.cmd) script to deploy relevant files for targeting either .NET 6 or .NET 7.
+[SetupDotNetFiles.cmd](../../scripts/init/SetupDotNetFiles.cmd) script to deploy the relevant runtime config
+files for the selected target moniker.
 
-Additionally, even when targeting .NET 6, the `Microsoft.WinUI` projection dll
-produced by CSWinRT will always target .NET 6, since it ships with the Windows
-App SDK and must support .NET 6.
+Additionally, the `Microsoft.WinUI` projection dll produced by CsWinRT targets the lowest .NET version still
+supported by the Windows App SDK, since it ships with the Windows App SDK and must remain compatible with apps
+on that minimum version.
 
 ### C++ Language Standard
 

@@ -20,8 +20,7 @@ In particular: /build/NuSpecs enables .nupkg generation
 This folder contains all the source code for the Microsoft.UI.Xaml.Controls.dll 
 (formerly all WinUI2.x code).
 
-See the [source code structure doc](../controls/docs/source_code_structure.md) for more 
-information about the controls section of the repo. 
+Control source lives under `controls/dev/<ControlName>`, with shared build tooling under `controls/tools`.
 
 ## /docs
 This is where the repo documentation lives, including this document.

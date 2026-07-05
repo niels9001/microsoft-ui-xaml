@@ -136,7 +136,7 @@ on the thread are closed, the runtime shuts down asynchronously.
 
 
 ## Problems in System XAML Islands Lifetime / Shutdown
-See [xaml-islands](xaml-islands.md) for more background on some of these issues.
+See [xaml-islands](xaml-islands/xaml-islands.md) for more background on some of these issues.
 
 Below is a list of some of the biggest Xaml Islands problems and our progress/plans for them.
 

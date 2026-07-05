@@ -115,7 +115,7 @@ ptr.try_as<winrt::typeB>()   // dynamic cast
 * Optimised pointer which does COM pointer like ref counting but for non-COM XAML objects in core layer as AddRef and 
   Release functions are not virtual functions. xref_ptr is templated and can make direct (compile type computed) calls for each type.
 
-File: [`dxaml/xcp/components/base/inc/inc/xref_ptr.h`](../../dxaml/xcp/components/base/inc/inc/xref_ptr.h)
+File: [`dxaml/xcp/components/base/inc/xref_ptr.h`](../../dxaml/xcp/components/base/inc/xref_ptr.h)
 
 #### Usage
 ```c++

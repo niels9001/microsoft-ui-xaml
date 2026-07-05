@@ -93,10 +93,11 @@ In the Nightly build, we also run x86chk tests on RS5 and 19H1.
 
 
 ### How many tests do we have? How long do they take to run?
-We have about 8000 tests. There are two types of tests, native written in C++ and managed in C# (.net 5 with cs/winrt).
+We have about 8000 tests. There are two types of tests, native written in C++ and managed in C# (modern .NET with cs/winrt).
 Native tests run in both HostingModes UWP and WPF.
-However managed tests can only be ran in WPF mode. Reason being managed tests built on .net 5 and there is no official
-support for .net 5 in UWP.
+However managed tests can only be ran in WPF mode. Reason being managed tests are built on modern .NET (see the
+[.NET version configured by `init.cmd`](../building/developer-guide.md#configuring-the-net-version)) and there is no
+official support for that in UWP.
 End-to-end, these tests take about 8 hours to run in total. Including machine creation and
 configuration time, deployment time, re-try time, etc. the amount of actual machine time is higher than this. Because
 we distribute the work items across multiple machines in parallel the total wall-clock time is less than this.
@@ -569,7 +570,7 @@ WinUI Gallery is one of the Sample Apps. In addition we have a set of simple sce
 of the four basic scenarios that we support:
 * C# UWP
 * C++/WinRT UWP
-* C# Desktop (.net 5 with cs/winrt)
+* C# Desktop (modern .NET with cs/winrt)
 * C++/WinRT Desktop
 
 ### When do these tests run?

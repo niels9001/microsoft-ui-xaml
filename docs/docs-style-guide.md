@@ -13,12 +13,12 @@
 
 Here are some style guides and best practices for documentation in the WinUI 3 repo. The suggestions here are not
 hard-and-fast rules and are only enforced by the contributors to this repo, and you can choose alternative formatting
-on a case-by-case basis. You should, however, ensure that your formatting works in the ADO Preview pane, where most
+on a case-by-case basis. You should, however, ensure that your formatting renders correctly on GitHub, where most
 people will be reading these articles.
 
 This style guide is based on standard Markdown, as well as the
-[Microsoft Documentation Contributor Guide](https://review.docs.microsoft.com/en-us/help/contribute/markdown-reference?branch=main).
-Not everything there will apply, however, as the public Microsoft docs have various plug-ins that our repo in ADO does not.
+[Microsoft Documentation Contributor Guide](https://learn.microsoft.com/contribute/content/markdown-reference).
+Not everything there will apply, however, as the public Microsoft docs have various plug-ins that this repo does not.
 
 ## Headings
 
@@ -39,10 +39,17 @@ Contents confusingly long (more below).
 
 ## Tables of Contents
 
-Tables of Contents are very useful in long documents. To create a table of contents, add a **\[[\_TOC\_]]**.
-The TOC is generated when the tag gets added and there's at least one heading on the page.
+Tables of Contents are very useful in long documents. On GitHub, a Table of Contents is generated automatically from
+the headings in a file — open the built-in outline via the list icon at the top-right of the rendered file to
+navigate. You do not need to add one manually.
 
-Tables of Contents should be placed after the title (H1) and before any other headings.
+If you want an inline, always-visible Table of Contents (useful when the doc is also read outside GitHub), add a
+manual bulleted list of links to the headings, placed after the title (H1) and before any other headings. For example:
+
+``` markdown
+- [Section one](#section-one)
+- [Section two](#section-two)
+```
 
 ## Code
 
@@ -56,8 +63,8 @@ There are several ways to include code in an article.
   * Blocks are created by surrounding code with triple backticks (three \` characters). Do not create code blocks with
     only indentation.
   * Include the programming language to get syntax highlighting.
-    * When specifying language, use lowercase -- some editors work well with uppercase, but ADO will only give syntax
-      highlighting in the raw view when using lowercase.
+    * When specifying language, use lowercase (e.g. `csharp`, `cpp`, `xml`) for the most consistent highlighting
+      across renderers.
 
   ```markdown
       ```csharp
@@ -68,11 +75,6 @@ There are several ways to include code in an article.
       ```
   ```
 
-<!-- ADO bug means that without this blank code snippet, Contents tab formatting is broken. The code-ception above messes it up.
-```cpp
-```
--->
-
 * Placeholders
   * If you want the user to replace a section of displayed code with their own values, use placeholder text marked off
   by angle brackets. For example:
@@ -80,10 +82,9 @@ There are several ways to include code in an article.
 
 ## Links
 
-Much of the [public documentation](https://docs.microsoft.com/en-us/contribute/how-to-write-links) regarding links applies to this repo.
+Much of the [public documentation](https://learn.microsoft.com/contribute/content/how-to-write-links) regarding links applies to this repo.
 
 * Descriptive link text (rather than "click here" links) should be preferred.
-* **TODO** to relative URL links for work us?
 * **File links** are used to link from one file to another within the repo:
   * All file paths use forward-slash (/) characters instead of back-slash characters.
   * An article links to another article in the same directory:
@@ -94,9 +95,9 @@ Much of the [public documentation](https://docs.microsoft.com/en-us/contribute/h
   * For a bookmark link to a heading in the current file, use a hash symbol followed by the lowercase words of the
   heading. Remove punctuation from the heading and replace spaces with dashes:
     * ` [Managed Disks](#managed-disks) `
-  * To link to a bookmark heading in another article, use the file-relative or site-relative link plus a hash symbol,
+  * To link to a bookmark heading in another article, use the file-relative link plus a hash symbol,
   followed by the words of the heading. Remove punctuation from the heading and replace spaces with dashes:
-    * ` [Managed Disks](../../linux/overview.md#managed-disks) `
+    * ` [Managed Disks](../other-article.md#managed-disks) `
 
 ## Bold and italic text
 
@@ -109,13 +110,13 @@ Much of the [public documentation](https://docs.microsoft.com/en-us/contribute/h
 
 ## Tables
 
-See the [official documentation](https://review.docs.microsoft.com/en-us/help/contribute/markdown-reference?branch=main#tables)
-for how to format tables. There are different ways to do tables in Markdown, but this one works in ADO. (The section
-about line breaking using a custom div class does not apply to our repo).
+See the [official documentation](https://learn.microsoft.com/contribute/content/markdown-reference#tables)
+for how to format tables. There are different ways to do tables in Markdown; use the standard pipe-delimited form,
+which renders correctly on GitHub.
 
 ## Comments
 
-ADO supports HTML comments if you must comment out sections of your article: `<!--- Here's my comment --->`
+GitHub-flavored Markdown supports HTML comments if you must comment out sections of your article: `<!-- Here's my comment -->`
 
 ## Readability
 
@@ -130,9 +131,9 @@ ADO supports HTML comments if you must comment out sections of your article: `<!
    ```
 
 * All code blocks should be surrounded by blank lines.
-* **Word wrapping**: The raw markdown view in ADO does not wrap lines, which can make the raw view very hard to read.
+* **Word wrapping**: Long unwrapped lines can make the raw markdown and diffs hard to read.
 Consider writing your documents with newlines at about 120 columns. You can put a guide line in VS Code to help you, or
-use an VS Code extension like Rewrap. You may want to leave the long lines in very long articles where such manual
+use a VS Code extension like Rewrap. You may want to leave the long lines in very long articles where such manual
 manipulation would be a lot of work, or in articles you expect to change with some frequency (and changing the newlines
 would make history very hard to read). You could also consider only adding newlines after getting PR approval on your
 document, since at that point most changes will already have been made.

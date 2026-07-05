@@ -37,7 +37,7 @@ There are also per-architecture packages.*.config files. For example packages.x6
 
 The complete list of all package dependency lists (restore files):
 * [packages.config](../../packages.config)
-* packages.[arch].config ([x86](../packages.x86.config), [x64](../../packages.x64.config), [arm64](../../packages.arm64.config))
+* packages.[arch].config ([x86](../../packages.x86.config), [x64](../../packages.x64.config), [arm64](../../packages.arm64.config))
 * [controls\dev\dll\packages.config](../../controls/dev/dll/packages.config) (contains reference to Microsoft.Web.WebView2)
 * [src\BuildTools.sln](../../src/BuildTools.sln)
 
@@ -95,7 +95,7 @@ and of CSWinRT, is by setting the
 [TFM](https://docs.microsoft.com/en-us/dotnet/standard/frameworks) in the project file:
 
 ```xml
-<TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
+<TargetFramework>net8.0-windows10.0.18362.0</TargetFramework>
 ```
 
 The Windows SDK version can be overridden though by FrameworkReference items:
