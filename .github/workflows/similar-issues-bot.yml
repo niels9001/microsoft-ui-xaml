@@ -1,38 +1,203 @@
-name: GitGudSimilarIssues comments
+name: Dedupe retrieval pilot
 
 on:
-  issues:
-    types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_numbers:
+        description: JSON array of fork issue numbers to inspect
+        required: true
+        default: "[]"
+
+permissions:
+  issues: write
+
+concurrency:
+  group: dedupe-retrieval-pilot
+  cancel-in-progress: false
 
 jobs:
-  getsimilarissues:
+  retrieve:
     runs-on: ubuntu-latest
-    outputs:
-      message: ${{ steps.getbody.outputs.message }}
+    strategy:
+      max-parallel: 2
+      fail-fast: false
+      matrix:
+        issue: ${{ fromJson(inputs.issue_numbers) }}
     steps:
-      - uses: actions/checkout@v4
-      - id: getbody
-        uses: craigloewen-msft/GitGudSimilarIssues@main
-        with:
-          issueTitle: ${{ github.event.issue.title }}
-          issueBody: ${{ github.event.issue.body }}
-          repo: ${{ github.repository }}
-          similaritytolerance: "0.81"
-          commentBody: | 
-            Hi I'm an AI powered bot that finds similar issues based off the issue title.
-
-             Please view the issues below to see if they solve your problem, and if the issue describes your problem please consider closing this one. Thank you!
-  add-comment:
-    needs: getsimilarissues
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    if: needs.getsimilarissues.outputs.message != ''
-    steps:
-      - name: Add comment
-        run: gh issue comment "$NUMBER" --repo "$REPO" --body "$BODY"
+      - name: Find likely duplicate candidates
+        uses: actions/github-script@d746ffe35508b1917358783b479e04febd2b8f71 # v9.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NUMBER: ${{ github.event.issue.number }}
-          REPO: ${{ github.repository }}
-          BODY: ${{ needs.getsimilarissues.outputs.message }}
+          TARGET_ISSUE: ${{ matrix.issue }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const targetNumber = Number(process.env.TARGET_ISSUE);
+            const marker = '<!-- winui-dedupe-pilot:canonical:v1 -->';
+            const maxCandidates = 5;
+
+            if (!Number.isSafeInteger(targetNumber) || targetNumber <= 0) {
+              core.setFailed(`Invalid issue number: ${process.env.TARGET_ISSUE}`);
+              return;
+            }
+
+            const normalize = value => String(value || '')
+              .normalize('NFKC')
+              .toLowerCase()
+              .replace(/<!--[\s\S]*?-->/g, ' ')
+              .replace(/https?:\/\/\S+/g, ' ')
+              .replace(/[^a-z0-9_.+#-]+/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim();
+
+            const stopWords = new Set([
+              'a', 'an', 'and', 'are', 'as', 'at', 'be', 'but', 'by', 'for',
+              'from', 'has', 'have', 'in', 'is', 'it', 'not', 'of', 'on', 'or',
+              'that', 'the', 'this', 'to', 'was', 'when', 'with', 'winui'
+            ]);
+
+            const tokens = (value, max = 250) => new Set(
+              normalize(value)
+                .split(' ')
+                .filter(token => token.length > 1 && !stopWords.has(token))
+                .slice(0, max)
+            );
+
+            const jaccard = (left, right) => {
+              if (!left.size || !right.size) return 0;
+              let intersection = 0;
+              for (const token of left) {
+                if (right.has(token)) intersection++;
+              }
+              return intersection / (left.size + right.size - intersection);
+            };
+
+            const escapeMarkdown = value => String(value || '')
+              .replace(/<!--[\s\S]*?-->/g, ' ')
+              .replace(/[\u0000-\u001F\u007F]/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim()
+              .slice(0, 180)
+              .replaceAll('\\', '\\\\')
+              .replaceAll('&', '&amp;')
+              .replaceAll('<', '&lt;')
+              .replaceAll('>', '&gt;')
+              .replaceAll('@', '@\u200B')
+              .replace(/([`*_{}\[\]()#+.!|~-])/g, '\\$1');
+
+            const target = (await github.rest.issues.get({
+              owner,
+              repo,
+              issue_number: targetNumber
+            })).data;
+
+            if (target.pull_request) {
+              core.setFailed(`#${targetNumber} is a pull request`);
+              return;
+            }
+
+            const allItems = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'all',
+              sort: 'created',
+              direction: 'desc',
+              per_page: 100
+            });
+
+            const targetTitle = normalize(target.title);
+            const targetTitleTokens = tokens(target.title, 60);
+            const targetBodyTokens = tokens(target.body, 250);
+            const candidates = [];
+
+            for (const candidate of allItems) {
+              if (candidate.pull_request || candidate.number === targetNumber) continue;
+
+              const candidateTitle = normalize(candidate.title);
+              const titleScore = jaccard(targetTitleTokens, tokens(candidate.title, 60));
+              const bodyScore = jaccard(targetBodyTokens, tokens(candidate.body, 250));
+              const exactTitle = Boolean(targetTitle && targetTitle === candidateTitle);
+              const score = exactTitle ? 1 : (titleScore * 0.8) + (bodyScore * 0.2);
+
+              if (score < 0.2) continue;
+              candidates.push({
+                number: candidate.number,
+                title: candidate.title,
+                state: candidate.state,
+                score,
+                exactTitle
+              });
+            }
+
+            candidates.sort((left, right) =>
+              right.score - left.score ||
+              Number(right.exactTitle) - Number(left.exactTitle) ||
+              right.number - left.number
+            );
+
+            const selected = candidates.slice(0, maxCandidates);
+            const lines = [
+              marker,
+              '## Dedupe retrieval pilot',
+              '',
+              'This comment shows deterministic retrieval results, not a duplicate verdict.',
+              'A maintainer should confirm whether the underlying behavior and root cause are the same.',
+              ''
+            ];
+
+            if (selected.length === 0) {
+              lines.push('No candidates met the pilot retrieval threshold.');
+            } else {
+              lines.push('### Possible related issues', '');
+              for (const candidate of selected) {
+                const confidence = candidate.score >= 0.85
+                  ? 'High'
+                  : candidate.score >= 0.55
+                    ? 'Medium'
+                    : 'Low';
+                const reason = candidate.exactTitle
+                  ? 'Exact normalized title match'
+                  : `Title/body token overlap score ${candidate.score.toFixed(2)}`;
+                lines.push(
+                  `- #${candidate.number} - ${escapeMarkdown(candidate.title)} ` +
+                  `(${candidate.state}; ${confidence}) - ${reason}`
+                );
+              }
+            }
+
+            lines.push(
+              '',
+              '_Fork-only experiment; it does not apply labels or close issues._'
+            );
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: targetNumber,
+              per_page: 100
+            });
+            const existing = comments
+              .filter(comment =>
+                comment.user?.login === 'github-actions[bot]' &&
+                typeof comment.body === 'string' &&
+                comment.body.includes(marker))
+              .sort((left, right) => right.id - left.id)[0];
+            const body = lines.join('\n');
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body
+              });
+              core.notice(`Updated pilot comment on #${targetNumber}`);
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: targetNumber,
+                body
+              });
+              core.notice(`Created pilot comment on #${targetNumber}`);
+            }

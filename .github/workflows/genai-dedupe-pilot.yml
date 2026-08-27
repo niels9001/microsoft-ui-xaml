@@ -1,0 +1,36 @@
+name: GenAI dedupe pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_numbers:
+        description: JSON array of fork issue numbers to inspect
+        required: true
+        default: "[]"
+
+permissions:
+  models: read
+  issues: write
+
+concurrency:
+  group: genai-dedupe-pilot
+  cancel-in-progress: false
+
+jobs:
+  deduplicate:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        issue: ${{ fromJson(inputs.issue_numbers) }}
+    steps:
+      - name: Run GenAI issue deduplicator
+        uses: pelikhan/action-genai-issue-dedup@bdb3b5d9451c1090ffcdf123d7447a5e7c7a2528 # v0.0.19
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_issue: ${{ matrix.issue }}
+          count: "50"
+          max_duplicates: "5"
+          label_as_duplicate: "false"
+          state: all
