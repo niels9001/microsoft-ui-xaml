@@ -85,6 +85,26 @@ jobs:
               .replaceAll('@', '@\u200B')
               .replace(/([`*_{}\[\]()#+.!|~-])/g, '\\$1');
 
+            const section = (body, heading) => {
+              const source = String(body || '');
+              const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const headingPattern = new RegExp(
+                `^###\\s+${escaped}\\s*$`,
+                'im'
+              );
+              const match = headingPattern.exec(source);
+              if (!match) return '';
+              const remainder = source.slice(match.index + match[0].length);
+              const nextHeading = remainder.search(/^###\s+/m);
+              return (nextHeading >= 0 ? remainder.slice(0, nextHeading) : remainder).trim();
+            };
+
+            const hasMeaningfulValue = (value, minimumLength) => {
+              const normalized = normalize(value);
+              return normalized.length >= minimumLength &&
+                !['_no response_', 'no response', 'n/a', 'none'].includes(normalized);
+            };
+
             const target = (await github.rest.issues.get({
               owner,
               repo,
@@ -136,6 +156,27 @@ jobs:
             );
 
             const selected = candidates.slice(0, maxCandidates);
+            const isBug = /^###\s+Describe the bug\s*$/im.test(target.body || '');
+            const isFeature = /^###\s+Summary\s*$/im.test(target.body || '') &&
+              /^###\s+Rationale\s*$/im.test(target.body || '');
+            const missingBugFields = [];
+            if (isBug) {
+              const requiredBugFields = [
+                ['Describe the bug', 20],
+                ['Why is this important?', 20],
+                ['Steps to reproduce the bug', 30],
+                ['Actual behavior', 8],
+                ['Expected behavior', 8],
+                ['NuGet package version', 3],
+                ['Windows version', 3]
+              ];
+              for (const [heading, minimumLength] of requiredBugFields) {
+                if (!hasMeaningfulValue(section(target.body, heading), minimumLength)) {
+                  missingBugFields.push(heading);
+                }
+              }
+            }
+
             const lines = [
               marker,
               '## Dedupe retrieval pilot',
@@ -144,6 +185,21 @@ jobs:
               'A maintainer should confirm whether the underlying behavior and root cause are the same.',
               ''
             ];
+
+            lines.push('### Intake signal', '');
+            if (isBug && missingBugFields.length) {
+              lines.push(
+                `Bug report; incomplete or very short fields: ` +
+                `${missingBugFields.map(escapeMarkdown).join(', ')}.`
+              );
+            } else if (isBug) {
+              lines.push('Bug report; the required issue-form fields appear to be populated.');
+            } else if (isFeature) {
+              lines.push('Feature proposal; bug reproduction guidance does not apply.');
+            } else {
+              lines.push('Issue type was not recognized from the current issue forms.');
+            }
+            lines.push('');
 
             if (selected.length === 0) {
               lines.push('No candidates met the pilot retrieval threshold.');
